@@ -5,6 +5,7 @@ import com.daar.indexcv.DTO.ArticleSaveDTO;
 import com.daar.indexcv.entity.Article;
 import com.daar.indexcv.service.ArticleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping("/api")
+@Slf4j
 public class ArticleController {
     private final ArticleService articleService;
 
@@ -30,6 +32,7 @@ public class ArticleController {
 
     @GetMapping("/articles")
     public ResponseEntity<List<Article>> getArticles(){
+        log.info("Hello All Articles");
         List<Article> articles = articleService.getAllArticles();
         return ResponseEntity.ok().body(articles);
     }

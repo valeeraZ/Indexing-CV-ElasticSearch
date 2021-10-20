@@ -5,7 +5,7 @@ mvnw
 mvnw.cmd
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+!src/main/resources/logback-spring.xml
 
 ### STS ###
 .apt_generated
