@@ -1,5 +1,6 @@
 package com.daar.indexcv.service;
 
+import com.daar.indexcv.entity.CV;
 import com.daar.indexcv.exceptions.EmptyFileException;
 import com.daar.indexcv.repository.CVRepository;
 import com.google.common.collect.ImmutableMap;
@@ -11,11 +12,15 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Wenzhuo Zhao on 20/10/2021.
@@ -49,5 +54,17 @@ public class CVService {
         String index = response.getIndex();
         String id = response.getId();
         log.info("Save document " + name + " in " + index + " with id " + id);
+    }
+
+    public List<CV> query(){
+        Iterator<CV> ite = cvRepository.findAll().iterator();
+        List<CV> res = new ArrayList<>();
+        while (ite.hasNext()){
+            res.add(ite.next());
+        }
+        return res;
+    }
+
+    public List<CV> queryIncontent(){
     }
 }

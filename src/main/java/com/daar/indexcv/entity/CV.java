@@ -18,12 +18,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class CV {
     @Id
     String id;
-    String content;
+    //String data;
     Attachment attachment;
 
-    public CV(String content){
-        this.content = content;
-    }
+//    public CV(String content){
+//        this.content = content;
+//    }
 }
 
 @Data
@@ -32,8 +32,9 @@ public class CV {
 @Builder
 class Attachment{
     public String content_type;
+    public String author;
+    public String title;
     public String language;
     public String content;
-    public int content_length;
-
+    //public int content_length;
 }

@@ -1,5 +1,6 @@
 package com.daar.indexcv.controller;
 
+import com.daar.indexcv.entity.CV;
 import com.daar.indexcv.service.CVService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Wenzhuo Zhao on 20/10/2021.
@@ -28,5 +30,11 @@ public class CVController {
     public ResponseEntity<Void> addCV(@NotNull(message = "The file cannot be null") MultipartFile file) throws IOException {
         cvService.save(file);
         return ResponseEntity.ok().build();
+    }
+
+    @ResponseBody
+    @GetMapping("/AllCV")
+    public List<CV> getAllCV(){
+        return cvService.query();
     }
 }
