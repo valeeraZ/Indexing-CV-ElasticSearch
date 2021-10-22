@@ -11,7 +11,12 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +36,9 @@ import java.util.List;
 public class CVService {
     private final CVRepository cvRepository;
     private final RestHighLevelClient highLevelClient;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     public void save(MultipartFile file) throws IOException {
         String name;
@@ -56,6 +64,7 @@ public class CVService {
         log.info("Save document " + name + " in " + index + " with id " + id);
     }
 
+    //Zhaojie LU
     public List<CV> query(){
         Iterator<CV> ite = cvRepository.findAll().iterator();
         List<CV> res = new ArrayList<>();
@@ -65,6 +74,14 @@ public class CVService {
         return res;
     }
 
-    public List<CV> queryIncontent(){
+    //Zhaojie LU
+    public List<CV> queryInContent(String keyword){
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("attachment.content",keyword)).build();
+        SearchHits<CV> search = elasticsearchRestTemplate.search(searchQuery, CV.class);
+        List<CV> cvs = new ArrayList<>();
+        for(SearchHit<CV> searchHit:search){
+            cvs.add(searchHit.getContent());
+        }
+        return cvs;
     }
 }

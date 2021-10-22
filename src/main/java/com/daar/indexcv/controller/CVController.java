@@ -32,9 +32,19 @@ public class CVController {
         return ResponseEntity.ok().build();
     }
 
+
+    //Zhaojie LU
     @ResponseBody
     @GetMapping("/AllCV")
     public List<CV> getAllCV(){
         return cvService.query();
+    }
+
+
+    //Zhaojie LU
+    @ResponseBody
+    @GetMapping("/search")
+    public List<CV> queryInContent(@RequestParam("keyword") String keyword){
+        return cvService.queryInContent(keyword);
     }
 }
