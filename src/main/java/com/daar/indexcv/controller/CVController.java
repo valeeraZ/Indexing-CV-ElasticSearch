@@ -44,7 +44,7 @@ public class CVController {
     //Zhaojie LU
     @ResponseBody
     @GetMapping("/search")
-    public List<CV> queryInContent(@RequestParam("keyword") String keyword){
+    public List<CV> queryInContent(@RequestParam("keyword") @NotNull(message = "The keyword cannot be null") String keyword)throws IOException {
         return cvService.queryInContent(keyword);
     }
 }

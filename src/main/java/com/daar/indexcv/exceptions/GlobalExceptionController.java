@@ -43,6 +43,13 @@ public class GlobalExceptionController {
         return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);
     }
 
+    @ExceptionHandler(EmptyKeywordException.class)
+    public ResponseEntity<ErrorResponse> handleEmptyKeywordException(EmptyKeywordException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(ex,request.getRequestURI());
+        log.warn("EmptyKeywordException: " + ex.getData());
+        return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request){
         Map<String, Object> errors = new HashMap<>(8);

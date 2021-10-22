@@ -2,6 +2,7 @@ package com.daar.indexcv.service;
 
 import com.daar.indexcv.entity.CV;
 import com.daar.indexcv.exceptions.EmptyFileException;
+import com.daar.indexcv.exceptions.EmptyKeywordException;
 import com.daar.indexcv.repository.CVRepository;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -76,11 +77,15 @@ public class CVService {
 
     //Zhaojie LU
     public List<CV> queryInContent(String keyword){
-        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("attachment.content",keyword)).build();
-        SearchHits<CV> search = elasticsearchRestTemplate.search(searchQuery, CV.class);
         List<CV> cvs = new ArrayList<>();
-        for(SearchHit<CV> searchHit:search){
-            cvs.add(searchHit.getContent());
+        if(!keyword.isEmpty()) {
+            NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("attachment.content", keyword)).build();
+            SearchHits<CV> search = elasticsearchRestTemplate.search(searchQuery, CV.class);
+            for (SearchHit<CV> searchHit : search) {
+                cvs.add(searchHit.getContent());
+            }
+        }else{
+            throw new EmptyKeywordException(ImmutableMap.of("keyword", "empty"));
         }
         return cvs;
     }
