@@ -1,10 +1,12 @@
 package com.daar.indexcv.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +16,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by Wenzhuo Zhao on 20/10/2021.
@@ -67,12 +70,21 @@ public class GlobalExceptionController {
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request){
         Map<String, Object> errors = new HashMap<>(8);
         ex.getConstraintViolations().forEach(error -> {
-            String fieldName = error.getPropertyPath().toString();
+            String fieldName = ((PathImpl)error.getPropertyPath()).getLeafNode().getName();
             String message = error.getMessage();
             errors.put(fieldName,message);
         });
         ErrorResponse errorResponse = new ErrorResponse(ErrorCode.METHOD_ARGUMENT_INVALID,request.getRequestURI(),errors);
         log.warn("ConstraintViolationException: " + errors.keySet());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex, HttpServletRequest request){
+        String name = ex.getParameterName();
+        Map<String, Object> errors = Map.of("name", name);
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.METHOD_ARGUMENT_INVALID,request.getRequestURI(),errors);
+        log.warn("MissingServletRequestParameterException: " + errors.keySet());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

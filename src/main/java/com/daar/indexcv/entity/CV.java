@@ -1,5 +1,8 @@
 package com.daar.indexcv.entity;
 
+import com.daar.indexcv.representation.CVLongRepresentation;
+import com.daar.indexcv.representation.CVShortRepresentation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,23 +21,25 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class CV {
     @Id
     String id;
-    //String data;
+    String username;
+    String data;
     Attachment attachment;
 
-//    public CV(String content){
-//        this.content = content;
-//    }
-}
+    public CVShortRepresentation toCVShortRepresentation(){
+        return CVShortRepresentation.builder()
+                .id(id)
+                .username(username)
+                .attachment(attachment)
+                .build();
+    }
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class Attachment{
-    public String content_type;
-    public String author;
-    public String title;
-    public String language;
-    public String content;
-    //public int content_length;
+    public CVLongRepresentation toCVLongRepresentation(){
+        return CVLongRepresentation.builder()
+                .id(id)
+                .username(username)
+                .data(data)
+                .attachment(attachment)
+                .build();
+    }
+
 }

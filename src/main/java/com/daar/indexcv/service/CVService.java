@@ -1,9 +1,13 @@
 package com.daar.indexcv.service;
 
 import com.daar.indexcv.entity.CV;
+import com.daar.indexcv.entity.CVShort;
+import com.daar.indexcv.exceptions.BadFormatException;
 import com.daar.indexcv.exceptions.EmptyFileException;
 import com.daar.indexcv.exceptions.EmptyKeywordException;
 import com.daar.indexcv.repository.CVRepository;
+import com.daar.indexcv.repository.CVShortRepository;
+import com.daar.indexcv.representation.CVShortRepresentation;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,19 +41,20 @@ import java.util.List;
 @Slf4j
 public class CVService {
     private final CVRepository cvRepository;
+    private final CVShortRepository cvShortRepository;
     private final RestHighLevelClient highLevelClient;
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
-    public void save(MultipartFile file) throws IOException {
+    public String save(String username, MultipartFile file) throws IOException {
         String name;
         if (!file.isEmpty()) {
             name = file.getOriginalFilename();
             Tika tika = new Tika();
             String detectedType = tika.detect(file.getBytes());
             if (!(detectedType.equals("application/pdf") || detectedType.equals("application/x-tika-ooxml"))) {
-                throw new EmptyFileException(ImmutableMap.of("filename", name, "extension", detectedType));
+                throw new BadFormatException(ImmutableMap.of("filename", name, "extension", detectedType));
             }
         } else {
             throw new EmptyFileException(ImmutableMap.of("filename", "empty"));
@@ -56,19 +62,21 @@ public class CVService {
 
         String contents = DatatypeConverter.printBase64Binary(file.getBytes());
         IndexRequest request = new IndexRequest("cv")
-                .source("data", contents)
+                .source("data", contents,
+                        "username", username)
                 .setPipeline("attachment");
 
         IndexResponse response = highLevelClient.index(request, RequestOptions.DEFAULT);
         String index = response.getIndex();
         String id = response.getId();
-        log.info("Save document " + name + " in " + index + " with id " + id);
+        log.info("Save document " + name + " of user " + username + " in " + index + " with id " + id);
+        return id;
     }
 
     //Zhaojie LU
-    public List<CV> query(){
-        Iterator<CV> ite = cvRepository.findAll().iterator();
-        List<CV> res = new ArrayList<>();
+    public List<CVShort> query(){
+        Iterator<CVShort> ite = cvShortRepository.findAll().iterator();
+        List<CVShort> res = new ArrayList<>();
         while (ite.hasNext()){
             res.add(ite.next());
         }
@@ -76,12 +84,12 @@ public class CVService {
     }
 
     //Zhaojie LU
-    public List<CV> queryInContent(String keyword){
-        List<CV> cvs = new ArrayList<>();
+    public List<CVShort> queryInContent(String keyword){
+        List<CVShort> cvs = new ArrayList<>();
         if(!keyword.isEmpty()) {
             NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("attachment.content", keyword)).build();
-            SearchHits<CV> search = elasticsearchRestTemplate.search(searchQuery, CV.class);
-            for (SearchHit<CV> searchHit : search) {
+            SearchHits<CVShort> search = elasticsearchRestTemplate.search(searchQuery, CVShort.class);
+            for (SearchHit<CVShort> searchHit : search) {
                 cvs.add(searchHit.getContent());
             }
         }else{
