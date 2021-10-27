@@ -48,8 +48,17 @@ public class CVController {
     public ResponseEntity<List<CVShort>> queryInContent(@RequestParam("keyword") @NotNull(message = "The keyword cannot be null") String keyword)throws IOException {
         return ResponseEntity.ok().body(cvService.queryInContent(keyword));
     }
+    //HOU Zhen
     @GetMapping("/cvs/get")
     public ResponseEntity<CV> getCVbyId(@RequestParam("id") @NotNull(message = "The keyword cannot be null") String id)throws IOException {
         return ResponseEntity.ok().body(cvService.queryGetById(id));
+    }
+
+    @PutMapping("/cvs/update")
+    public ResponseEntity<String> updateCV(@NotNull(message = "The username cannot be null") @NotEmpty(message = "The username cannot be empty") String username ,
+                                        @NotNull(message = "The file cannot be null") MultipartFile file,
+                                           @RequestParam("id") @NotNull(message = "The keyword cannot be null") String id  ) throws IOException {
+         cvService.updateCV(id, file,username);
+        return ResponseEntity.ok().body(id);
     }
 }

@@ -16,6 +16,8 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -34,9 +36,7 @@ import com.alibaba.fastjson.JSON;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Wenzhuo Zhao on 20/10/2021.
@@ -130,5 +130,37 @@ public class CVService {
         }
 
         return null;
+    }
+//HOU Zhen
+    public String updateCV(String id, MultipartFile file,String username) throws IOException {
+        String name;
+        if (!file.isEmpty()) {
+            name = file.getOriginalFilename();
+            Tika tika = new Tika();
+            String detectedType = tika.detect(file.getBytes());
+            if (!(detectedType.equals("application/pdf") || detectedType.equals("application/x-tika-ooxml"))) {
+                throw new BadFormatException(ImmutableMap.of("filename", name, "extension", detectedType));
+            }
+        } else {
+            throw new EmptyFileException(ImmutableMap.of("filename", "empty"));
+        }
+
+        String contents = DatatypeConverter.printBase64Binary(file.getBytes());
+
+        IndexRequest request = new IndexRequest("cv")
+                .source("data", contents,
+                        "username", username)
+                //.setPipeline("attachment")
+                ;
+        UpdateRequest updateRequest = new UpdateRequest("cv",id).doc(request);
+        //updateRequest.;
+        //Map<String, Object> jsonMap = new HashMap<>();
+        //jsonMap.put("data", contents);
+
+        UpdateResponse response = highLevelClient.update(updateRequest, RequestOptions.DEFAULT);
+        String index = response.getIndex();
+        //String id = response.getId();
+        log.info("Save document " + name + " of user " + username + " in " + index + " with id " + id);
+        return id;
     }
 }
