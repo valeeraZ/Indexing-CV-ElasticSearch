@@ -14,9 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -26,6 +30,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.alibaba.fastjson.JSON;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -96,5 +101,34 @@ public class CVService {
             throw new EmptyKeywordException(ImmutableMap.of("keyword", "empty"));
         }
         return cvs;
+    }
+    //HOU Zhen
+    public CV queryGetById(String id){
+        try{
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(QueryBuilders.termQuery("_id", id));
+            SearchRequest searchRequest = new SearchRequest("cv");
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+
+            if (RestStatus.OK.equals(searchResponse.status())) {
+                org.elasticsearch.search.SearchHits hits = searchResponse.getHits();
+                for (org.elasticsearch.search.SearchHit hit : hits) {
+                    // 将 JSON 转换成对象
+                    //CV res = hit.getSourceAsString()
+                    CV res = JSON.parseObject(hit.getSourceAsString(), CV.class);
+                    res.setId(id);
+                    log.info("get Cv by id: "+res.toString());
+                    //System.out.println("cv: "+res);
+                    return res;
+                }
+
+            }
+            }
+        catch (IOException e) {
+            log.error("", e);
+        }
+
+        return null;
     }
 }

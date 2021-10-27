@@ -48,4 +48,8 @@ public class CVController {
     public ResponseEntity<List<CVShort>> queryInContent(@RequestParam("keyword") @NotNull(message = "The keyword cannot be null") String keyword)throws IOException {
         return ResponseEntity.ok().body(cvService.queryInContent(keyword));
     }
+    @GetMapping("/cvs/get")
+    public ResponseEntity<CV> getCVbyId(@RequestParam("id") @NotNull(message = "The keyword cannot be null") String id)throws IOException {
+        return ResponseEntity.ok().body(cvService.queryGetById(id));
+    }
 }

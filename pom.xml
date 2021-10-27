@@ -15,12 +15,19 @@
     <description>Indexing CVs in ElasticSearch with Spring Boot</description>
     <properties>
         <java.version>11</java.version>
+
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.78</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
