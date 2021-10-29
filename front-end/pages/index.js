@@ -8,7 +8,7 @@ import styles from '../styles/Home.module.css'
 export default function Home({data}) {
   return (
     <Layout>
-      <ListCV data={data}></ListCV>
+      <ListCV data={data}/>
     </Layout>
   )
 }

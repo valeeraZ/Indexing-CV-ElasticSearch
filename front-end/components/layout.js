@@ -17,7 +17,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
 import postCV from '../lib/postCV';
-import Link from 'next/link'
+import NextLink from 'next/link'
+import Link from '@mui/material/Link'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -103,16 +104,15 @@ export default function Layout({ children }) {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-            <Link href="/">
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ display: { xs: 'none', sm: 'block' } }}
-              >
+            <NextLink href="/" passHref>
+              <Link variant="h6"
+                    underline="none"
+                    color="#FFFFFF"
+                    sx={{ display: { xs: 'none', sm: 'block' } }}>
                 Index and search CV
-              </Typography>
-            </Link>
+
+              </Link>
+            </NextLink>
             <Box sx={{ flexGrow: 1 }}>
               <Search sx={{ flexGrow: 1 }}>
                 <SearchIconWrapper>

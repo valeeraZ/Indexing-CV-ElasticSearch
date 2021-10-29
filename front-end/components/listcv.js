@@ -6,13 +6,17 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import Link from 'next/link'
+import {ListItemButton} from "@mui/material";
 
 export default function ListCV({ data }) {
     return (
         <List >
             {data.map(({ id, username, attachment }) => (
                 <div key={id}>
+                <Link href={`/cv?id=${id}`} passHref>
                     <ListItem alignItems="flex-start">
+                        <ListItemButton>
                         <ListItemAvatar>
                             <Avatar {...stringAvatar(username)} />
                         </ListItemAvatar>
@@ -32,8 +36,10 @@ export default function ListCV({ data }) {
                                 </React.Fragment>
                             }
                         />
+                        </ListItemButton>
                     </ListItem>
-                    <Divider variant="inset" component="li" />
+                </Link>
+                <Divider variant="inset" component="li" />
                 </div>
             ))}
         </List>
