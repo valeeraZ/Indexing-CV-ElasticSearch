@@ -2,7 +2,17 @@
 This is a project for using Elastic Search with Spring Boot to index CVs in the course "Sorbonne Université Master 2 Cours MU5IN552: Développement des Algorithmes d’Application Réticulaire."
 
 # Team
-Wenzhuo ZHAO[(wenzhuo.zhao@etu.sorbonne-universite.fr)](mailto:wenzhuo.zhao@etu.sorbonne-universite.fr), Chengyu YANG, Zhaojie LU, Zhen HOU
+* Wenzhuo ZHAO[(wenzhuo.zhao@etu.sorbonne-universite.fr)](mailto:wenzhuo.zhao@etu.sorbonne-universite.fr)
+* Chengyu YANG[(cheng-yu.yang@etu.sorbonne-universite.fr)](mailto:cheng-yu.yang@etu.sorbonne-universite.fr)
+* Zhaojie LU[(zhaojie.lu@etu.sorbonne-universite.fr)](mailto:zhaojie.lu@etu.sorbonne-universite.fr)
+* Zhen HOU[(zhen.hou@etu.sorbonne-universite.fr)](mailto:zhen.hou@etu.sorbonne-universite.fr)
+
+# Demo
+We have created a front end using the APIs of POST and GET, here is a video of demo:
+
+https://user-images.githubusercontent.com/39196828/139540517-13cf6df1-dbda-45ee-b657-121e3d07fe32.mov
+
+
 
 # Documentation of API
 See https://documenter.getpostman.com/view/10263827/UV5ZBGVr for exemples.
@@ -55,3 +65,5 @@ See https://documenter.getpostman.com/view/10263827/UV5ZBGVr for exemples.
 6. Once the "attachment" pipeline is set, run the project then you can try to add or search some CV files by the API in the documentation.
 
 7. If you have Logstash installed on your machine, you can modify the IP address and port in `logback-spring.xml` by replacing them with yours and discover the logs in Kibana
+  <img width="1440" alt="Screenshot 2021-10-30 at 17 49 17" src="https://user-images.githubusercontent.com/39196828/139540305-fcf4fd11-8bf0-4e3e-aa98-c68fe45607e6.png">
+    
