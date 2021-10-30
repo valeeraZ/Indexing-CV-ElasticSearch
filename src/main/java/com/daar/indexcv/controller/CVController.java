@@ -31,6 +31,13 @@ import java.util.Optional;
 public class CVController {
     private final CVService cvService;
 
+    /**
+     * @author Wenzhuo ZHAO
+     * add a cv with the name of published
+     * @param username the name of publisher of CV
+     * @param file the CV file in pdf or docx
+     * @return ResponseEntity<String> containing the CV's id in ElasticSearch
+     */
     @PostMapping("/cvs")
     public ResponseEntity<String> addCV(@NotNull(message = "The username cannot be null") @NotEmpty(message = "The username cannot be empty") String username ,
                                         @NotNull(message = "The file cannot be null") MultipartFile file) throws IOException {
@@ -39,24 +46,46 @@ public class CVController {
     }
 
 
-    //Zhaojie LU
+    /**
+     * @author Zhaojie LU
+     * get all cv only without data(base64)
+     */
     @GetMapping("/cvs")
     public ResponseEntity<List<CVShort>> getAllCV(){
         return ResponseEntity.ok().body(cvService.query());
     }
 
-    //Zhaojie LU
+    /**
+     * @author Zhaojie LU
+     * search CVs with a keyword
+     * @param keyword the keyword to search with
+     * @return ResponseEntity<List<CVShort>> a list of CVs without the data(base64)
+     */
     @GetMapping("/cvs/search")
     public ResponseEntity<List<CVShort>> queryInContent(@RequestParam("keyword") @NotNull(message = "The keyword cannot be null") String keyword)throws IOException {
         return ResponseEntity.ok().body(cvService.queryInContent(keyword));
     }
-    //HOU Zhen
-    // Why can't you use @PathVariable ? This is not RESTful
+
+    /**
+     * @author Zhen HOU
+     * get a CV by its id
+     * TODO: use PathVariable to make the API RestFul
+     * @param id the id of CV in ElasticSearch
+     * @return ResponseEntity<CV> the CV
+     */
     @GetMapping("/cvs/get")
     public ResponseEntity<CV> getCVbyId(@RequestParam("id") @NotNull(message = "The id cannot be null") @NotEmpty(message = "The id cannot be empty") String id)throws IOException {
         return ResponseEntity.ok().body(cvService.queryGetById(id));
     }
 
+    /**
+     * @author Zhen HOU
+     * update a cv by its id
+     * @param username the username to modify
+     * @param file the file to modify
+     * @param id the CV's id
+     * @return ResponseEntity<String> containing the CV's id in ElasticSearch
+     */
     @PutMapping("/cvs/update")
     public ResponseEntity<String> updateCV(@NotNull(message = "The username cannot be null") @NotEmpty(message = "The username cannot be empty") String username ,
                                         @NotNull(message = "The file cannot be null") MultipartFile file,
@@ -65,6 +94,11 @@ public class CVController {
         return ResponseEntity.ok().body(id);
     }
 
+    /**
+     * @author Chengyu YANG
+     * delete a CV by its id
+     * @param id the id of the CV to be deleted
+     */
     @DeleteMapping("/cvs/{id}, /cvs")
     public ResponseEntity<Void> deleteCV(@PathVariable(value = "id") String id){
         cvService.deleteCV(id);
