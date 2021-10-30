@@ -5,6 +5,7 @@ import com.daar.indexcv.entity.CVShort;
 import com.daar.indexcv.exceptions.BadFormatException;
 import com.daar.indexcv.exceptions.EmptyFileException;
 import com.daar.indexcv.exceptions.EmptyKeywordException;
+import com.daar.indexcv.exceptions.IdNotFoundException;
 import com.daar.indexcv.repository.CVRepository;
 import com.daar.indexcv.repository.CVShortRepository;
 import com.daar.indexcv.representation.CVShortRepresentation;
@@ -79,32 +80,35 @@ public class CVService {
     }
 
     //Zhaojie LU
-    public List<CVShort> query(){
+    public List<CVShort> query() {
         Iterator<CVShort> ite = cvShortRepository.findAll().iterator();
         List<CVShort> res = new ArrayList<>();
-        while (ite.hasNext()){
+        while (ite.hasNext()) {
             res.add(ite.next());
         }
         return res;
     }
 
     //Zhaojie LU
-    public List<CVShort> queryInContent(String keyword){
+    public List<CVShort> queryInContent(String keyword) {
         List<CVShort> cvs = new ArrayList<>();
-        if(!keyword.isEmpty()) {
+        if (!keyword.isEmpty()) {
             NativeSearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("attachment.content", keyword)).build();
             SearchHits<CVShort> search = elasticsearchRestTemplate.search(searchQuery, CVShort.class);
             for (SearchHit<CVShort> searchHit : search) {
                 cvs.add(searchHit.getContent());
             }
-        }else{
+        } else {
             throw new EmptyKeywordException(ImmutableMap.of("keyword", "empty"));
         }
         return cvs;
     }
+
     //HOU Zhen
-    public CV queryGetById(String id){
-        try{
+    // Wenzhuo ZHAO: a simple way: use CVRepository returning Optional<CV>
+    // TODO: handle the empty id exception
+    public CV queryGetById(String id) {
+        try {
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             searchSourceBuilder.query(QueryBuilders.termQuery("_id", id));
             SearchRequest searchRequest = new SearchRequest("cv");
@@ -118,21 +122,21 @@ public class CVService {
                     //CV res = hit.getSourceAsString()
                     CV res = JSON.parseObject(hit.getSourceAsString(), CV.class);
                     res.setId(id);
-                    log.info("get Cv by id: "+res.toString());
+                    //log.info("get Cv by id: " + res.toString());
                     //System.out.println("cv: "+res);
                     return res;
                 }
 
             }
-            }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("", e);
         }
 
         return null;
     }
-//HOU Zhen
-    public String updateCV(String id, MultipartFile file,String username) throws IOException {
+
+    //HOU Zhen
+    public String updateCV(String id, MultipartFile file, String username) throws IOException {
         String name;
         if (!file.isEmpty()) {
             name = file.getOriginalFilename();
@@ -152,7 +156,7 @@ public class CVService {
                         "username", username)
                 //.setPipeline("attachment")
                 ;
-        UpdateRequest updateRequest = new UpdateRequest("cv",id).doc(request);
+        UpdateRequest updateRequest = new UpdateRequest("cv", id).doc(request);
         //updateRequest.;
         //Map<String, Object> jsonMap = new HashMap<>();
         //jsonMap.put("data", contents);
@@ -162,5 +166,16 @@ public class CVService {
         //String id = response.getId();
         log.info("Save document " + name + " of user " + username + " in " + index + " with id " + id);
         return id;
+    }
+
+    public void deleteCV(String id){
+        if(!cvRepository.existsById(id))
+            throw new IdNotFoundException(ImmutableMap.of("id", id));
+        cvRepository.deleteById(id);
+        log.info("Delete document with id " + id);
+    }
+
+    public String deleteAll(){
+        return "Dangerous Method not supported";
     }
 }

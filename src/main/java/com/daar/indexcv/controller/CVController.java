@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Wenzhuo Zhao on 20/10/2021.
@@ -49,8 +51,9 @@ public class CVController {
         return ResponseEntity.ok().body(cvService.queryInContent(keyword));
     }
     //HOU Zhen
+    // Why can't you use @PathVariable ? This is not RESTful
     @GetMapping("/cvs/get")
-    public ResponseEntity<CV> getCVbyId(@RequestParam("id") @NotNull(message = "The keyword cannot be null") String id)throws IOException {
+    public ResponseEntity<CV> getCVbyId(@RequestParam("id") @NotNull(message = "The id cannot be null") @NotEmpty(message = "The id cannot be empty") String id)throws IOException {
         return ResponseEntity.ok().body(cvService.queryGetById(id));
     }
 
@@ -61,4 +64,11 @@ public class CVController {
          cvService.updateCV(id, file,username);
         return ResponseEntity.ok().body(id);
     }
+
+    @DeleteMapping("/cvs/{id}, /cvs")
+    public ResponseEntity<Void> deleteCV(@PathVariable(value = "id") String id){
+        cvService.deleteCV(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -86,5 +87,21 @@ public class GlobalExceptionController {
         ErrorResponse errorResponse = new ErrorResponse(ErrorCode.METHOD_ARGUMENT_INVALID,request.getRequestURI(),errors);
         log.warn("MissingServletRequestParameterException: " + errors.keySet());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPathVariableException(MissingPathVariableException ex, HttpServletRequest request){
+        String name = ex.getVariableName();
+        Map<String, Object> errors = Map.of("name", name);
+        ErrorResponse errorResponse = new ErrorResponse(ErrorCode.METHOD_ARGUMENT_INVALID,request.getRequestURI(),errors);
+        log.warn("MissingPathVariableException: " + errors.keySet());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(IdNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleIdNotFoundException(IdNotFoundException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(ex,request.getRequestURI());
+        log.warn("IdNotFoundException: " + ex.getData());
+        return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);
     }
 }
